@@ -3,7 +3,7 @@ layout: post
 title: mysql explain详解
 description: "mysql explain"
 modified: 2014-05-1
-tags: [Photography]
+tags: [mysql]
 image:
   background: triangular.png
 ---

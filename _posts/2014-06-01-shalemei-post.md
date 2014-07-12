@@ -3,7 +3,7 @@ layout: post
 title: 西方文化中的千变莎乐美
 description: "莎乐美"
 modified: 2014-06-01
-tags: [Photography]
+tags: [philosophy]
 image:
   background: triangular.png
 ---
