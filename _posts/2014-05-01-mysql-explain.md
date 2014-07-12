@@ -29,15 +29,10 @@ explain只能解释select查询，对update，delete，insert需要重写为sele
 
 ```
 用于表示是简单还是复杂的查询，不包括子查询和union的查询为简单查询。如果查询中有任何复杂的部分，外层查询标记为primary。复杂查询分为四大类(SUBQUERY,DERIVED,UNION,UNION RESULT)
-
 (1)SUBQUERY:包含在select列表中的子查询中的select，不在from子句中的select
-
 (2)DERIVED:表示包含在from子句中的select。mysql会递归的执行并将结果放在一个临时表中，服务器内部称其为“派生表”
-
 (3)UNION:在union中第二个和随后的select被标记为union。
-
 (4)UNION RESULT:用来在UNION产生的匿名临时表检索结果的select被标记为union result
-
 综上,select_type共有SIMPLE,PRIMARY,SUBQUERY,DERIVED,UNION,UNION RESULT 六种常见情况。
 ```
 
@@ -56,18 +51,12 @@ explain只能解释select查询，对update，delete，insert需要重写为sele
 ```
 访问类型mysql决定如何查找表中的行，从最差到最优依次如下：
 (1)ALL:全表扫描，通常意味着mysql必须扫描整张表，从头到尾去找到所需要的行。
-
 (2):index：这和全表扫描一样，只是mysql在扫描表示按索引次序进行而不是行，他的主要优点是避免了排序，最大的缺点是承担按索引次数读取整张表的开销。如果Extra字段看到Using
-
 (3):index，说明Mysql正在使用覆盖索引，他比按索引次序全表扫描开销要少得多。
-
 (4)range：范围扫描就是一个有限制的索引扫描，它开始于索引的某一点，返回匹配这个值域的行。这比全索引扫描要好一些，因为它用不着遍历全部索引。 显而易见的范围扫描时带有between或者where>,当mysql使用索引去查找in()和or时也会显示range。但是这两者在性能上有很重要的差异。
-
 (5)ref：这是一种索引访问（索引查找），它返回所有匹配某个单个值得行，然而它可能找到多个符合条件的行，因此它是查找和扫描的混合体。此类索引的扫描只有在使用非唯一索引或者唯一索引的非唯一前缀时才发生。
 (6)eq_ref：使用这种索引查找，mysql最多只返回一条记录。这种访问方法在使用mysql主键或者唯一索引查找时看到。它会将他们与某个参考值作比较。
-
 (7)const,system 当mysql能够从某部分进行优化将其转换为一个常量时，它就会使用这些访问类型。比如如下查询：explain select id from mis_audit_comment where id = 1\G;
-
 (8)NULL 这种访问方式意味着Mysql能在优化阶段分解查询语句，在执行阶段甚至用不着访问表和索引。
 ```
 
@@ -117,7 +106,6 @@ mysql估计为了找到所需的行而要读取的行数。是mysql认为它要�
 
 ```
 记录了不适合在其他列中显示的额外信息
-
 (1)Using index:mysql将使用覆盖索引，以避免访问表。
 (2)Using where:mysql服务器将在存储引擎检索行后再进行过滤。
 (3)Using temporary:mysql在对结果排序时使用了临时表
