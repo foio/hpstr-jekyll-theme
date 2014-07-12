@@ -1,5 +1,5 @@
-title:            Site Title
-description:      Describe your website here.
+title:            积木小站
+description:      知识是细流.
 disqus_shortname: 
 reading_time:     true
 words_per_minute: 200
@@ -32,9 +32,9 @@ links:
     external: true
 
 # http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-timezone:    America/New_York
+timezone:    Asia/Chongqing
 future:      true
-pygments:    true
+#pygments:    true
 #highlighter: pygments
 #markdown:    kramdown
 markdown:     rdiscount 
