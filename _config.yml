@@ -4,26 +4,15 @@ disqus_shortname:
 reading_time:     true
 words_per_minute: 200
 #Your site's domain goes here. Leave localhost server or blank when working locally.
-url:              http://localhost:4000
+url:          
 
 # Owner/author information
 owner:
-  name:           Your Name
-  avatar:         avatar.jpg
-  bio:            "Your bio goes here. It shouldn't be super long but a good two sentences or two should suffice."
-  email:          you@email.com
+  name:           foio
+  avatar:         self.jpg
+  bio:            "Baidu Software Engineer"
+  email:          syszhpe@gmail.com
   # Social networking links used in footer. Update and remove as you like.
-  twitter:        
-  facebook:       
-  github:         
-  stackexchange:  
-  linkedin:       
-  instagram:      
-  flickr:         
-  tumblr:         
-  # For Google Authorship https://plus.google.com/authorship
-  google_plus:   
-
 # Background image to be tiled on all pages
 background: 
 
@@ -47,7 +36,8 @@ timezone:    America/New_York
 future:      true
 pygments:    true
 #highlighter: pygments
-markdown:    kramdown
+#markdown:    kramdown
+markdown:     rdiscount 
 
 # https://github.com/mojombo/jekyll/wiki/Permalinks
 permalink:   /:categories/:title/
