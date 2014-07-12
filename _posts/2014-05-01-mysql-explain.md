@@ -14,12 +14,19 @@ explain只能解释select查询，对update，delete，insert需要重写为sele
 
 下面就explain的各个字段分别解释。
 
+-----
+
 **1.id**
+
 ```
 当sql语句中有子查询和关联查询时会显示多列，id用于标志多列数据。
 ```
 
+-----
+
+
 **2.select_type**
+
 ```
 用于表示是简单还是复杂的查询，不包括子查询和union的查询为简单查询。如果查询中有任何复杂的部分，外层查询标记为primary。复杂查询分为四大类(SUBQUERY,DERIVED,UNION,UNION RESULT)
 
@@ -33,12 +40,19 @@ explain只能解释select查询，对update，delete，insert需要重写为sele
 
 综上,select_type共有SIMPLE,PRIMARY,SUBQUERY,DERIVED,UNION,UNION RESULT 六种常见情况。
 ```
+
+-----
+
 **3.table**
+
 ```
 一般情况下为表名,当from子句中有子查询或者union时，table列会变得复杂的多，在这种情况下，mysql会创建匿名的临时表，这种情况下，table列为**derived N**的形式，其中N时子查询的id。当有UNION时，UNION RESULT的table列包含一个参与UNION的id列表，形为**union1,3**
 ```
 
+-----
+
 **4.type**
+
 ```
 访问类型mysql决定如何查找表中的行，从最差到最优依次如下：
 (1)ALL:全表扫描，通常意味着mysql必须扫描整张表，从头到尾去找到所需要的行。
@@ -57,29 +71,50 @@ explain只能解释select查询，对update，delete，insert需要重写为sele
 (8)NULL 这种访问方式意味着Mysql能在优化阶段分解查询语句，在执行阶段甚至用不着访问表和索引。
 ```
 
+-----
+
 **5.possible_key**
+
 ```
 显示查询可以使用的索引。
 ```
 
+-----
+
 **6.key**
+
 ```
 显示mysql决定使用哪个索引来优化对表的访问。
 ```
 
+-----
+
 **7. key_len**
+
 ```
 mysql在索引里使用的字节数，可以根据key_len计算出该索引正在使用哪些列。可以根据key_len查看sql语句使用联合索引的情况。当有多列索引(audit_status,status,create_time)时，key_len为2时，表示只用了第一个为small int的索引。
 ```
+
+-----
+
 **8.ref**
+
 ```
 显示table在key中选取的索引中查找值所用的列或者常量。
 ```
+
+-----
+
 **9.row**
+
 ```
 mysql估计为了找到所需的行而要读取的行数。是mysql认为它要检查的行数，而不是结果集里的行数。
 ```
+
+-----
+
 **10.Extra**
+
 ```
 记录了不适合在其他列中显示的额外信息
 
