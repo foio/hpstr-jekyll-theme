@@ -68,7 +68,7 @@ try "cfx test" and then "cfx run". Have fun!"
 
 扩展的具体逻辑在lib/main.js中。假如我们的想在浏览器的工具栏上实现一个button，点击后在新的tab页面中打开www.baidu.com。具体的逻辑代码如下：
 
-```javascrip
+{% highlight javascript %}
 var widgets = require("sdk/widget");
 var tabs = require("sdk/tabs");
 var widget = widgets.Widget({
@@ -79,7 +79,7 @@ var widget = widgets.Widget({
     tabs.open("http://developer.mozilla.org/");
   }
 });
-```
+{% endhighlight %}
 
 当然你也可以自定义button的icon，只需要替换data目录下的icon-16.png，icon-32.png，icon-64.png
 
