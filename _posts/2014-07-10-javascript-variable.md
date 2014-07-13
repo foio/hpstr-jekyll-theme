@@ -18,13 +18,13 @@ function f(){
   alter(scope);
 }
 f();
-{% highlight  %}
+{% endhighlight %}
 
 这段代码的执行结果为：
 {% highlight javascript %}
 undefined
 local
-{% highlight  %}
+{% endhighlight %}
 
 输出local很容易理解，应用局部作用域的变量覆盖了全局作用域。但是输出undefined就有点奇怪了？
 
