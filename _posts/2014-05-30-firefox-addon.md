@@ -11,7 +11,8 @@ image:
 firefox扩展开发主要有两种模式：
 
 >1.Add-ons SDK扩展，sdk的特点是简单，适合初级玩家。这种开发方式最快的入门方法就是阅读[mozilla的官方文档](https://developer.mozilla.org/en-US/Add-ons/SDK)。
-2.bootstrap扩展，这种扩展开发方式从无到有完全手动，需要学习firefox的界面描述语言，适合高级玩家。 可以参考[IMB developwoker上的一篇入门文章](http://www.ibm.com/developerworks/cn/web/wa-lo-firefox-ext/)
+
+>2.bootstrap扩展，这种扩展开发方式从无到有完全手动，需要学习firefox的界面描述语言，适合高级玩家。 可以参考[IMB developwoker上的一篇入门文章](http://www.ibm.com/developerworks/cn/web/wa-lo-firefox-ext/)
 
 本人属于初级玩家，所以本文主要描述使用Add-ons SDK建立一个具有基本功能的扩展。
 
