@@ -27,7 +27,7 @@ firefox.exe -P
 ```
 会打开如下窗口：
 <figure>
-    <img src="http://sztqb.sznews.com/res/1/641/2010-11/04/C04/res01_attpic_brief.jpg"/>
+    <img src="/images/firefox_profile.jpg"/>
     <figcaption>firefox profile窗口</figcaption>
 </figure>
 
