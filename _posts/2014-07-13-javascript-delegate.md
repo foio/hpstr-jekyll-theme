@@ -75,5 +75,11 @@ $(“#info_table”).delegate(“td”,”click”,function(){//TODO});
 2. 支持在连缀的DOM遍历方法后面调用，即支持$(“table”).find(“#info”).delegate…，支持精确控制；
 ```
 
-可见，.delegate()方法是一个相对完美的解决方案。但在DOM结构简单的情况下，也可以使用.live()。
+在jQuery1.7中 .delegate()已被.on()取代,.on与.delegate主要区别在参数顺序。使用.on前面的例子可以这样写：
+
+{% highlight javascript %}
+$(“#info_table”).on(”click”,“td”,function(){//TODO;});
+{% endhighlight  %}
+
+可见，.delegate()与.on()方法是一个相对完美的解决方案。但在DOM结构简单的情况下，也可以使用.live()。
 >提示：使用事件委托时，如果注册到目标元素上的其他事件处理程序使用.stopPropagation()阻止了事件传播，那么事件委托就会失效。
