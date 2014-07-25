@@ -2,7 +2,7 @@
 layout: post
 title: mysql explain详解
 description: "mysql explain"
-modified: 2014-05-1
+modified: 2013-07-10
 tags: [mysql]
 image:
   background: triangular.png
