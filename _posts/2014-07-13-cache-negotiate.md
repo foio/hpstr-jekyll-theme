@@ -6,6 +6,7 @@ modified: 2014-01-13
 tags: [server browser]
 image:
   background: triangular.png
+comments: true
 ---
 
 >当我们通过浏览器打开一个web页时，浏览器会将下载到的html，图片，js，css等缓存到本地。一旦浏览器向web服务器再次请求同样的内容时，便直接可以从本地获取。这种缓存策略是由浏览器和web服务器协商达成的，这就是http中的“**缓存协商**”

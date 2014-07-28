@@ -6,6 +6,7 @@ modified: 2014-07-13
 tags: [javascript]
 image:
   background: triangular.png
+comments: true
 ---
 
 随着DOM结构的复杂化和Ajax等动态脚本技术的运用，事件委托自然浮出了水面。jQuery为绑定和委托事件提供了.bind()、.live()和.delegate()方法。本文在讨论这几个方法内部实现的基础上，展示它们的优劣势及适用场合。

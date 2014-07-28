@@ -6,6 +6,7 @@ modified: 2014-07-24
 tags: [mysql]
 image:
   background: triangular.png
+comments: true
 ---
 
 Mysql是这个世界上最通用的数据库了，很多优点集于一身：开源、高效、免费等。但是对于生成实践中的高并发、高可用性、安全性等要求，单台mysql往往无法满足。

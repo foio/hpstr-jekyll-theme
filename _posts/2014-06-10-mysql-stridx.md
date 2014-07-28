@@ -6,6 +6,7 @@ modified: 2014-06-10
 tags: [mysql]
 image:
   background: triangular.png
+comments: true
 ---
 
 事情的起因是线上日志发现的mysql慢查询。100万数据量的标准，联合查询全部走索引的情况下，尽然要600多毫秒。很不解，但是将索引列由varchar(50)型改为bigint型后，数据提升了30倍。究其原因就索引树上搜索时要进行大量的比较操作，而字符串的比较比整数的比较耗时的多。

@@ -6,6 +6,7 @@ modified: 2014-06-15
 tags: [nginx php]
 image:
   background: triangular.png
+comments: true
 ---
 
 配置好nginx和php后发现php-error一直没有日志。google了一下终于搞定了，主要对php-fpm.conf和php.ini做出如下修改:

@@ -6,6 +6,7 @@ modified: 2013-09-01
 tags: [philosophy]
 image:
   background: triangular.png
+comments: true
 ---
 
 莎乐美原型最早见于《圣经·新约》福音书，讲述了施洗约翰之死：

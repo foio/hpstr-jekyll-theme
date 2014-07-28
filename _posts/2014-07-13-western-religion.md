@@ -6,6 +6,7 @@ modified: 2014-07-13
 tags: [philosophy]
 image:
   background: triangular.png
+comments: true
 ---
 
 稍微有点西方文明史方面知识的人，都或多或少的听过《荷马史诗》，当然由于文化差异加上阅读难度大，很少有人了解其细节。从公元前560年，雅典的青年就开始背诵《荷马史诗》。今天就从《荷马史诗》说起，说一下西方宗教的起源。

@@ -6,6 +6,7 @@ modified: 2014-05-20
 tags: [firefox]
 image:
   background: triangular.png
+comments: true
 ---
 
 firefox扩展开发主要有两种模式：

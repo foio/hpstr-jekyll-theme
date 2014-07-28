@@ -6,6 +6,7 @@ modified: 2014-07-16
 tags: [MachineLearning  weka]
 image:
   background: triangular.png
+comments: true
 ---
 
 weka是机器学习和数据挖掘库java库，提供有GUI界面版本和类库版本。weka是GNU通用公共许可证下发布的开源软件，这意味着我们在自己的项目自由的使用，并可以在开放源代码的情况下改进weka。在使用weka之前，我们首先要将自己的数据集转换为weka支持的格式。weka的数据格式请参考[arff格式说明][1]。学习weka库最好先有一下机器学习方面的基础知识，然后学习官方example。接下来简单说明如何使用weka库的kmeans算法。

@@ -6,6 +6,7 @@ modified: 2014-05-10
 tags: [firefox]
 image:
   background: triangular.png
+comments: true
 ---
 
 >profile是firefox的高级概念，开发者在扩展开发过程中一般使用不同的profile模拟不同的浏览器环境，用于测试扩展的兼容性。

@@ -6,6 +6,7 @@ modified: 2014-07-10
 tags: [javascript]
 image:
   background: triangular.png
+comments: true
 ---
 
 >众所周知，javascript有全局作用域和函数局部作用域(没有c，c++，java等强类型语言中的块作用域)。那下面一段代码的结果是什么呢？

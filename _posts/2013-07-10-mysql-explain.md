@@ -6,6 +6,7 @@ modified: 2013-07-10
 tags: [mysql]
 image:
   background: triangular.png
+comments: true
 ---
 
 >一个常见的理解错误：mysql在执行explain时不会执行sql语句，事实上如果查询的from字段有子查询，explain会执行子查询。
