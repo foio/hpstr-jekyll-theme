@@ -1,6 +1,6 @@
 ---
 layout: post
-title: linux expect用法详解
+title: linux expect详解
 description: "linux expect"
 modified: 2014-07-30
 tags: [linux expect]
@@ -11,13 +11,13 @@ comments: true
 
 Expect是一个用来处理**交互**的命令。借助Expect，我们可以将交互过程写在一个脚本上，使之自动化完成。形象的说，ssh登录，ftp登录等都符合**交互**的定义。下文我们首先提出一个问题，然后介绍基础知四个命令，最后提出解决方法。
 
-###问题
+##问题
 
 如何从机器A上ssh到机器B上，然后执行机器B上的命令？如何使之自动化完成？
 
 ---
 
-###四个命令
+##四个命令
 
 Expect中最关键的四个命令是send,expect,spawn,interact。
 
@@ -28,25 +28,25 @@ spawn：启动新的进程
 interact：允许用户交互
 ```
 
-####1. send命令
+###1. send命令
 
 send命令接收一个字符串参数，并将该参数发送到进程。
 
-{% highlight %}
+{% highlight java %}
 expect1.1> send "hello world\n"
 hello world
 {% endhighlight  %}
 
 
-####2. expect命令
+###2. expect命令
 
 -----
 
-**(1)基础知识**
+####(1)基础知识
 
 expect命令和send命令正好相反，expect通常是用来等待一个进程的反馈。expect可以接收一个字符串参数，也可以接收正则表达式参数。和上文的send命令结合，现在我们可以看一个最简单的交互式的例子：
 
-{% highlight %}
+{% highlight java %}
 expect "hi\n"
 send "hello there!\n"
 {% endhighlight  %}
@@ -59,7 +59,7 @@ tips： $expect_out(buffer)存储了所有对expect的输入，<$expect_out(0,st
 
 比如如下程序：
 
-{% highlight %}
+{% highlight java %}
 expect "hi\n"
 send "you typed <$expect_out(buffer)>"
 send "but I only expected <$expect_out(0,string)>"
@@ -82,26 +82,26 @@ I only expect: hi
 
 ------
 
-**(2)模式-动作**
+####(2)模式-动作
 
 
 expect最常用的语法是来自tcl语言的模式-动作。这种语法极其灵活，下面我们就各种语法分别说明。
 
 单一分支模式语法：
-{% highlight %}
+{% highlight java %}
 expect "hi" {send "You said hi"}
 {% endhighlight  %}
 匹配到hi后，会输出"you said hi"
 
 
 多分支模式语法：
-{% highlight %}
+{% highlight java %}
 expect "hi" { send "You said hi\n" } \
 "hello" { send "Hello yourself\n" } \
 "bye" { send "That was unexpected\n" }
 {% endhighlight  %}
 匹配到hi,hello,bye任意一个字符串时，执行相应的输出。等同于如下写法：
-{% highlight %}
+{% highlight java %}
 expect {
 "hi" { send "You said hi\n"}
 "hello" { send "Hello yourself\n"}
@@ -111,11 +111,11 @@ expect {
 
 -----
 
-####3. spawn命令
+###3. spawn命令
 
 上文的所有demo都是和标准输入输出进行交互，但是我们跟希望他可以和某一个进程进行交互。spawm命令就是用来启动新的进程的。spawn后的send和expect命令都是和spawn打开的进程进行交互的。结合上文的send和expect命令我们可以看一下更复杂的程序段了。
 
-{% highlight %}
+{% highlight java %}
 set timeout -1
 spawn ftp ftp.uu.net      //打开新的进程，该进程用户连接远程ftp服务器
 expect "Name"             //进程返回Name时
@@ -132,11 +132,11 @@ send "get test.tar.gz\r"  //向进程输入get test.tar.gz\r
 
 -----
 
-####4.interact
+###4.interact
 
 到现在为止，我们已经可以结合spawn、expect、send自动化的完成很多任务了。但是，如何让人在适当的时候干预这个过程了。比如下载完ftp文件时，仍然可以停留在ftp命令行状态，以便手动的执行后续命令。interact可以达到这些目的。下面的demo在自动登录ftp后，允许用户交互。
 
-{% highlight %}
+{% highlight java %}
 spawn ftp $argv
 expect "Name"
 send "anonymous\r"
@@ -153,7 +153,7 @@ interact
 
 下面一段脚本实现了从机器A登录到机器B，然后执行机器B上的pwd命令，并停留在B机器上，等待用户交互。具体含义请参考上文。
 
-{% highlight %}
+{% highlight java %}
  #!/home/tools/bin/64/expect -f
  set timeout -1  
  spawn ssh $BUser@$BHost
@@ -162,4 +162,3 @@ interact
  interact
 {% endhighlight  %}
 
-------
