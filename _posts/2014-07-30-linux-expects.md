@@ -117,11 +117,11 @@ expect {
 
 {% highlight java %}
 set timeout -1
-spawn ftp ftp.uu.net      //打开新的进程，该进程用户连接远程ftp服务器
+spawn ftp ftp.test.com      //打开新的进程，该进程用户连接远程ftp服务器
 expect "Name"             //进程返回Name时
-send "anonymous\r"        //向进程输入anonymous\r
+send "user\r"        //向进程输入anonymous\r
 expect "Password:"        //进程返回Password:时
-send "don@libes.com\r"    //向进程输入don@libes.com\r
+send "123456\r"    //向进程输入don@libes.com\r
 expect "ftp> "            //进程返回ftp>时
 send "binary\r"           //向进程输入binary\r
 expect "ftp> "            //进程返回ftp>时
@@ -137,11 +137,11 @@ send "get test.tar.gz\r"  //向进程输入get test.tar.gz\r
 到现在为止，我们已经可以结合spawn、expect、send自动化的完成很多任务了。但是，如何让人在适当的时候干预这个过程了。比如下载完ftp文件时，仍然可以停留在ftp命令行状态，以便手动的执行后续命令。interact可以达到这些目的。下面的demo在自动登录ftp后，允许用户交互。
 
 {% highlight java %}
-spawn ftp $argv
+spawn ftp ftp.test.com
 expect "Name"
-send "anonymous\r"
+send "user\r"
 expect "Password:"
-send "don@libes.com\r"
+send "123456\r"
 interact
 {% endhighlight  %}
 
