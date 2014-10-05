@@ -1,7 +1,7 @@
 ---
 layout: post
-title: php内核的自定义函数执行过程
-description: "php内核的用户定义函数执行过程"
+title: php内核之函数执行过程
+description: "php内核中用户定义函数执行过程"
 modified: 2014-10-05
 tags: [php]
 image:
