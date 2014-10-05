@@ -3,7 +3,7 @@ layout: post
 title: nginx和php-fpm日志配置
 description: "nginx和php-fpm"
 modified: 2014-06-15
-tags: [nginx php]
+tags: [nginx]
 image:
   background: triangular.png
 comments: true
