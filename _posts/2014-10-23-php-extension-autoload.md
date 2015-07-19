@@ -16,7 +16,7 @@ comments: true
 
 在 PHP 5 中我们可以定义一个 __autoload() 函数，它会在试图使用尚未被定义的类时自动调用，这样我们就可以定义一些自己的加载规则了。
 
-{% highlight c %}
+{% highlight php %}
 <?php
 function __autoload($class_name) {
     require_once $class_name . '.php';
@@ -29,7 +29,7 @@ $obj2 = new MyClass2();
 
 使用`spl_autoload_register`我们可以一次注册多个加载函数，PHP会在试图使用尚未被定义的类时按注册顺序调用。
 
-{% highlight c %}
+{% highlight php %}
 <?php
 function autoload_services($class_name)
 {
