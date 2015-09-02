@@ -31,7 +31,7 @@ sizzle解析器的主要有以下几个工作步骤。
 		<img src="/images/sizzle-step.jpg"/>
 </figure>
 
-接下来我们就一次解析。为了简单，我们在接下来的文章中都使用选择器`div input[name=ttt]`作为例子。
+接下来我们就依次解析。为了简单，我们在接下来的文章中都使用选择器`div input[name=ttt]`作为例子。
 
 ###1.词法分析
 
@@ -39,6 +39,8 @@ sizzle解析器的主要有以下几个工作步骤。
 
 词法分析是指我们将文本代码解析为一个个记号(token)，以便后续语法分析使用。
 ####(1) sizzle的token种类
+
+css选择器的词法分析相对较为简单，不用通过lex等专业工具，简单的正则表达式就搞定了。下面依次是用于切分分组，层级关系，以及单个元素的正则表达式。
 
 ```
 分组(,):/^[\x20\t\r\n\f]*,[\x20\t\r\n\f]*/
@@ -55,6 +57,7 @@ sizzle解析器的主要有以下几个工作步骤。
 
 ####(2)从左到右扫描生产token集合
 
+用正则表达式切分出token的过程，如下代码所示。基本原理就是从左到右扫描，用正则切分。
 {% highlight javascript %}
 //分组
   var rcomma = /^[\x20\t\r\n\f]*,[\x20\t\r\n\f]*/;
@@ -101,17 +104,17 @@ sizzle解析器的主要有以下几个工作步骤。
 最终生成的token集合如下:
 
 {% highlight javascript %}
-   {matches: ["div"],type: "TAG",value: "div“ }, 
-   {match:[“”], type: " ", value: " "},
-   {matches: ["input"], type: "TAG", value: "input"}, 
-   {matches: ["name"], type: "ATTR", value: "[name=ttt]"}
+{matches: ["div"],type: "TAG",value: "div“ }, 
+{matches:[“”], type: " ", value: " "},
+{matches: ["input"], type: "TAG", value: "input"}, 
+{matches: ["name"], type: "ATTR", value: "[name=ttt]"}
 {% endhighlight %}
 
 ###2.过滤函数
 
 ---
 
-sizzle针对每一种token都实现一个过滤函数，如下代码所示：
+过滤函数用于从浏览器dom模型中找到基本符合css选择器的种子集，sizzle针对每一种token都实现一个过滤函数，如下代码所示：
 {% highlight javascript %}
 //各种类型的token的过滤器，全部返回闭包函数
 Expr.filter = {
@@ -127,10 +130,43 @@ Expr.filter = {
 }
 {% endhighlight %}
 
-通过过滤函数我们可以.....
+通过部分过滤函数，我们可以初步得到符合条件的种子集合。如下图
+
+<figure>
+		<img src="/images/sizzle-seed.png"/>
+</figure>
 
 
-tired，休息去，明天继续
+###3.编译函数
+
+其实sizzle引擎最难的地方就在编译函数。为什么叫做编译呢？抽象的讲，把高级规则转换成底层实现就叫编译；比如高级语言到机器语言的过程就是编译。同样把抽象的css选择语法转变成具体的匹配函数的过程也是编译。
+<figure>
+		<img src="/images/sizzle-compile-step.png"/>
+</figure>
+
+编译的过程还是比较复杂的，其实就是从左到右扫描css选择表达式，并使用与当前token对应的过滤函组合成最终的超级匹配函数。扫描编译的核心步骤是：
+
+```
+(1)遇到关系token(+> ~)则依次出栈并根据层级规则合并栈中函数
+(2)其他情况将当前token对应的处理函数压入栈中
+(3)选择器表达式结束后依次出栈并合并栈中函数
+```
+
+很难说清楚，高手常常说一图胜千言，我也把扫描编译css选择表达式`div [name=ttt]`的过程做成图，希望能够讲清楚。
+
+<figure>
+		<img src="/images/sizzle-compile-process.png"/>
+</figure>
+
+现在假设我们已经通过编译获得了最终的超级匹配函数。那么从种子集中找到结果集就比较简单了。
+
+{% highlight javascript %}
+for item in seed
+      if(superMatcher(item )){
+               resultSet.push(item);
+      }
+return resultSet;
+{% endhighlight %}
 
 ---
 [为了便于理解本文，请下载本文对应的ppt](/download/sizzle-presentation.pptx)
