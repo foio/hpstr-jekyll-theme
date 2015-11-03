@@ -15,7 +15,7 @@ comments: true
 
 ```
 1.使用原生API有什么问题
-2.大牛时如何解决的
+2.大牛是如何解决的
 3.jQuery的实现
 ```
 
@@ -182,15 +182,14 @@ bind: function( types, data, fn ) {
 
 on函数内部调用了`jQuery.event.add`的add函数。
 
-
-{% highlight javascript %}
+```
 $(selector).on(event,childSelector,data,function,map)
 				||
 			   \||/
 			    \/
 jQuery.event.add( this, types, fn, data, selector );
 
-{% endhighlight %}
+```
 
 我们来分析以下add函数的代码：
 
