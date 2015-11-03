@@ -3,7 +3,7 @@ layout: post
 title: php扩展中autoload的实现
 description: "php扩展中autoload的实现"
 modified: 2014-10-23
-tags: [hive hadoop]
+tags: [php]
 image:
   background: triangular.png
 comments: true
@@ -16,7 +16,7 @@ comments: true
 
 在 PHP 5 中我们可以定义一个 __autoload() 函数，它会在试图使用尚未被定义的类时自动调用，这样我们就可以定义一些自己的加载规则了。
 
-{% highlight php %}
+``` php
 <?php
 function __autoload($class_name) {
     require_once $class_name . '.php';
@@ -25,11 +25,11 @@ function __autoload($class_name) {
 $obj  = new MyClass1();
 $obj2 = new MyClass2();
 ?>
-{% endhighlight %}
+```
 
 使用`spl_autoload_register`我们可以一次注册多个加载函数，PHP会在试图使用尚未被定义的类时按注册顺序调用。
 
-{% highlight php %}
+``` php
 <?php
 function autoload_services($class_name)
 {
@@ -50,19 +50,15 @@ function autoload_vos($class_name)
 spl_autoload_register('autoload_services');
 spl_autoload_register('autoload_vos');
 ?>
-
-{% endhighlight %}
+```
 
 
 ###2. 在php扩展中实现自动加载
 
 最近在写一个php扩展，其中一个功能就是实现类的自动加载，其实也是通过在内核中调用`spl_autoload_register`函数来实现。使用zend API调用`spl_autoload_register`函数还是相对简单的，下面我们主要讲一下如何在内核中实现`inclue/require/include_once/require_once`等指令的功能。其实`inclue/require/include_once/require_once`等指令主要是读入文件编译并执行，下面的方法就是完成了这些操作，代码中有详细的注释。
 
-####(1).在hive shell中加载
 
-首先加载jar包，并创建临时函数\
-
-{% highlight c %}
+``` c
 /*
 *  loader_import首先将PHP源文件编译成op_array，然后依次执行op_array中的opcode
 */
@@ -133,8 +129,7 @@ int loader_import(char *path, int len TSRMLS_DC) {
     }
     return 0;
 }
-{% endhighlight  %}
-
+```
 
 ---
 
