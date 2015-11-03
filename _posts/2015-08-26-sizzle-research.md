@@ -58,7 +58,7 @@ css选择器的词法分析相对较为简单，不用通过lex等专业工具�
 ####(2)从左到右扫描生产token集合
 
 用正则表达式切分出token的过程，如下代码所示。基本原理就是从左到右扫描，用正则切分。
-{% highlight javascript %}
+``` javascript
 //分组
   var rcomma = /^[\x20\t\r\n\f]*,[\x20\t\r\n\f]*/;
   //层级
@@ -99,23 +99,23 @@ css选择器的词法分析相对较为简单，不用通过lex等专业工具�
           }
       }
   }
-{% endhighlight %}
+```
 
 最终生成的token集合如下:
 
-{% highlight javascript %}
+``` javascript
 {matches: ["div"],type: "TAG",value: "div“ }, 
 {matches:[“”], type: " ", value: " "},
 {matches: ["input"], type: "TAG", value: "input"}, 
 {matches: ["name"], type: "ATTR", value: "[name=ttt]"}
-{% endhighlight %}
+```
 
 ###2.过滤函数
 
 ---
 
 过滤函数用于从浏览器dom模型中找到基本符合css选择器的种子集，sizzle针对每一种token都实现一个过滤函数，如下代码所示：
-{% highlight javascript %}
+``` javascript
 //各种类型的token的过滤器，全部返回闭包函数
 Expr.filter = {
     ATTR   : function (name, operator, check) {return closure}
@@ -128,7 +128,7 @@ Expr.filter = {
               };
      }
 }
-{% endhighlight %}
+```
 
 通过部分过滤函数，我们可以初步得到符合条件的种子集合。如下图
 
@@ -160,13 +160,13 @@ Expr.filter = {
 
 现在假设我们已经通过编译获得了最终的超级匹配函数。那么从种子集中找到结果集就比较简单了。
 
-{% highlight javascript %}
+``` javascript
 for item in seed
       if(superMatcher(item )){
                resultSet.push(item);
       }
 return resultSet;
-{% endhighlight %}
+```
 
 ---
 [为了便于理解本文，请下载本文对应的ppt](/download/sizzle-presentation.pptx)
