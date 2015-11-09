@@ -9,13 +9,13 @@ image:
 comments: true
 ---
 
-jQuery的回调系统时jQuery的基本功能之一,用于支撑jQuery的`ajax()`方法的实现和对promise规范的实现。jQuery提供了`callback`方法用于实现各种复杂回调功能.
+jQuery的回调系统是jQuery的基本功能之一,用于支撑jQuery的`ajax()`方法的实现和对promise规范的实现。jQuery提供了`callback`方法用于实现各种复杂回调功能.
 
 ###1.基本用法以及特殊参数
 
 ---
 
-下面时使用callback最简单的例子,其中`callback` 函数没有任何参数,其中`add`,`fire`,`remove` 的含义通过方法名可以立刻知道.
+下面是使用callback最简单的例子,其中`callback` 函数没有任何参数,其中`add`,`fire`,`remove` 的含义通过方法名可以立刻知道.
 
 {% highlight javascript %}
 var callbacks = $.Callbacks();
@@ -47,7 +47,7 @@ callbacks.fire( "foobar" );
 /*
 output:
 fn1 says:foo
-fn2 says:foo //这个输出时memory标记的作用
+fn2 says:foo //这个输出是memory标记的作用
 fn1 says:bar
 fn2 says:bar
 fn1 says:foobar

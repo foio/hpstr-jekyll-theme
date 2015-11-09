@@ -1,8 +1,8 @@
 title:            积木村の研究所
 description:      知识是细流.
-disqus_shortname: 
-reading_time:     true
-words_per_minute: 200
+#disqus_shortname: 评论
+#reading_time:     true
+#words_per_minute: 200
 #Your site's domain goes here. Leave localhost server or blank when working locally.
 url:          
 

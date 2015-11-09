@@ -3,7 +3,7 @@ layout: post
 title: sizzle引擎研究
 description: "sizzle引擎研究"
 modified: 2015-08-26
-tags: [jquery javascript]
+tags: [javascript]
 image:
   background: triangular.png
 comments: true

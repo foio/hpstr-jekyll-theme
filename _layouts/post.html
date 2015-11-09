@@ -56,6 +56,9 @@
         </div><!-- /.social-share -->{% endif %}
       </footer>
     </div><!-- /.entry-content -->
+
+    {% include sohu_comments.html %}	        
+
     {% if site.disqus_shortname and page.comments %}<section id="disqus_thread"></section><!-- /#disqus_thread -->{% endif %}
     {% if site.related_posts.size %}
     <div class="read-more">
@@ -81,6 +84,7 @@
   </article>
 </div><!-- /#main -->
 
+
 <div class="footer-wrapper">
   <footer role="contentinfo">
     {% include footer.html %}
@@ -88,6 +92,5 @@
 </div><!-- /.footer-wrapper -->
 
 {% include scripts.html %}	        
-
 </body>
 </html>
