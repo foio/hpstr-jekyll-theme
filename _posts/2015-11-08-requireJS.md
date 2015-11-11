@@ -32,7 +32,7 @@ define(['./a','./b'],function(a,b){
 
 ```
 
-本篇文章我们分析一下RequreJS的结构。没有任何准备就看源代码往往是一头雾水，我也并不打算在本文详解RequireJS的源代码，源代码处理很多细节问题，反而会影响我们从宏观上理解RequreJS的机构。你可以先了解几种在网页中异步加载javascript的方案（可以参考[我的另一篇博客](http://foio.github.io/javascript-async/)），然后思考还会碰到什么问题。就我而言，我提出如下两个基本问题：
+本篇文章我们实现一个自己的requreJS,我并不打算在源码中处理浏览器兼容性等细节，过于关注细节，反而会影响我们从宏观上理解代码机构。本文的目的是实现一个基本可用的javascript模块加载系统，带领读者理解要实现一个模块加载系统需要的知识结构。了解几种在网页中异步加载javascript的方案（可以参考[我的另一篇博客](http://foio.github.io/javascript-async/)），对理解本文有很大帮助。我提出如下两个基本问题：
 
 ```
 (1).RequireJS是如何异步加载js模块
@@ -45,7 +45,7 @@ define(['./a','./b'],function(a,b){
 <img src="/images/require-structure.png" alt="require structure">
 </figure>
 
-从图中可以看出，模块加载系统的require和define的实现，主要借助于4个子函数(矩形表示)和3个基本数据结构(椭圆形表示)，其中蓝色椭圆为require和define之间共同使用的数据结构。下文主要围绕着这个结构图展开，阅读过程中请随时参阅此图。
+从图中可以看出，模块加载系统的require和define的实现，主要借助于几个子函数(矩形表示)和两个基本数据结构(椭圆形表示)，其中蓝色矩形表示存在递归调用。下文主要围绕着这个结构图展开，阅读过程中请随时参阅此图。
 
 ---
 
@@ -56,21 +56,25 @@ define(['./a','./b'],function(a,b){
 
 ``` javascript
 //by foio.github.io
-function loadJS(url,callback){
-	//创建script节点
-	var node = document.createElement("script");
-	//监听脚本加载完成事件，处理浏览器的兼容性，针对符合W3C标准的浏览器和不符合W3C标准的浏览器分别监听不同的事件
-	node.[W3C?"onload":"onreadystatechange"] = function(){
-		if(callback){
-			callback();
-		}
-	};
-
-	//监听onerror事件处理javascript加载失败的情况
-	node.onerror = function(){}
-
-	node.src=url;
-	head.insertBefore(node,head.firstChild);
+//foioRequireJS的js加载函数 
+foioRequireJS.loadJS = function(url,callback){
+    //创建script节点
+    var node = document.createElement("script");
+    node.type="text/javascript";
+    //监听脚本加载完成事件，针对符合W3C标准的浏览器监听onload事件即可
+    node.onload = function(){
+        if(callback){
+            callback();
+        }
+    };
+    //监听onerror事件处理javascript加载失败的情况
+    node.onerror = function(){
+        throw Error('load script:'+url+" failed!"); 
+    }
+    node.src=url;
+    //插入到head中
+    var head = document.getElementsByTagName("head")[0];
+    head.appendChild(node);
 }
 ```
 
@@ -105,24 +109,8 @@ require(id,['c'],function(c){
 ###(1)组织依赖关系
 
 为了组织RquireJS需要哪些数据结构呢？看起来无从下手，我们可以对问题进行拆分。
-####<1>.define函数定义的模块放在哪里？
 
-每个define函数定义的模块都放在factorys里面，留待require函数执行时使用
-
-``` javascript
-//by foio.github.io
-factorys = {
-	...
-	id : {
-		deps: [],//模块的依赖	
-		factory: callback,//模块的回调函数
-	}
-	...
-};
-```
-
-
-####<2>.开始加载的模块放在哪里，如何标记模块的加载状态？
+####<1>.模块放在哪里，如何标记模块的加载状态？
 
 moudules存储了所有已经开始加载的模块，包括加载状态信息、依赖模块信息、模块的回调函数、以及回调函数callback返回的结果。
 
@@ -141,7 +129,7 @@ modules = {
 ```
 
 
-####<3>.正在加载但是还没有加载完成的模块id列表
+####<2>.正在加载但是还没有加载完成的模块id列表
 
 每个脚本加载完成事件onload触发时，都需要检查loading队列，确认哪些模块的依赖已经加载完成，是否可以执行
 
@@ -162,145 +150,141 @@ loadings = [
 
 ``` javascript
 //by foio.github.io
-req.define = function(name, deps, callback){
-	//根据模块名获取模块的url
-	var id = getScriptId(name);
-	//如果模块没有注册，就将模块加入factorys列表
-	if(!factorys[id]){
-		factorys[id] = {
-			deps: deps,
-			callback: callback,	
-			//延迟执行函数，在加载模块时调用，用于检测循环依赖问题
-			delay: function(id){
-				//检测到循环时抛出异常
-				if(checkCycle(modules[id].deps,id)){
-					throw new error("circular dependency detected for module:"+name);
-				}
-			}
-		};
-	}
-}
-```
+foioRequireJS.define = function(deps, callback){
+    //根据模块名获取模块的url
+    var id = foioRequireJS.getCurrentJs();
+    //将依赖中的name转换为id，id其实是模块javascript文件的全路径
+    var depsId = []; 
+    deps.map(function(name){
+        depsId.push(foioRequireJS.getScriptId(name));
+    });
+    //如果模块没有注册，就将模块加入modules列表
+    if(!modules[id]){
+            modules[id] = {
+                id: id, 
+                state: 1,//模块的加载状态   
+                deps:depsId,//模块的依赖关系
+                callback: callback,//模块的回调函数
+                exports: null,//本模块回调函数callback的返回结果，供依赖于该模块的其他模块使用
+                color: 0,
+            };
+    }
+};
 
-循环依赖检测函数的实现有些小技巧，需要理解上文提到的`modules`基本结构。因为checkCycle函数做了如下假设：
-所有依赖模块都已经存放在modules结构中了。所以我们需要注意checkClylce的调用时机。具体实现请参考本文代码。
- 
-``` javascript
-//by foio.github.io
-function checkCycle(deps,id){
-	//检查id的所有依赖模块
-	for(var depid in deps){
-		//如果模块已经加载完成则不可能存在循环依赖
-		//如果depid与id相等，则检测到循环依赖，否则递归的检测id与depid的依赖模块
-		if(modules[id].state !== 2 &&　(depid == id || checkCycle(module[depid].deps,id))){
-			return true;
-		}
-	}
-	return false;
-}
 ```
 
 ###(3). require函数的基本实现
-require函数的实现是相当复杂的，我们先确立程序的基本框架，再逐步深入到具体细节。
+require函数的实现是相当复杂的，我们先确立程序的基本框架，再逐步深入到具体细节。 其实require函数主要的逻辑就是将main模块放入modules和loadings队列。然后就开始调用loadDepsModule加载main模块的依赖模块。
+下面我们来看loadDepsModule的实现。
 
 ``` javascript
 //by foio.github.io
-var require = function(deps, callback){
-	var dn = 0, //依赖的模块数
-		cn = 0;	//已经加载的依赖模块数
-	deps.map(function(el){
-		//依赖数量加1
-		dn++;
-		//如果模块还没开始加载，则递归的调用require加载
-		if(!modules[el]){
-			//如果模块还没定义，则抛出异常
-			if(!factorys[el]){
-				throw new error("undefined module:"+name);
-			}
-			//加载js	
-			loadJS(el,function(){
-				//加载完成后执行依赖检查，如果没有依赖就执行callback函数
-				checkDeps();	
-			});
-			//标志模块已经开始加载
-			modules[el] = {
-				id: el, 
-				state: 1,//模块的加载状态	
-				deps:factorys[el].deps,//模块的依赖关系
-				factory: factorys[el].callback,//模块的回调函数
-				exportds: null,//本模块回调函数callback的返回结果，供依赖于该模块的其他模块使用
-			};
-			//模块开始加载时，放入加载队列，以便检测加载情况
-			loadings.unshift(el);						
-			//递归的调用require函数加载依赖模块
-			require(factorys[el].deps,factorys[el].callback);
-			//这时el模块的所有依赖都已经开始加载并存放在modules结构中了，可以检测循环依赖了
-			factorys[el].delay();
-		}
+foioRequireJS.require = function(deps,callback){
+    //获取主模块的id
+    id = foioRequireJS.getCurrentJs();
 
-		if(modules[el].state == 2){
-			cn++; //已经加载的依赖模块数加1
-		}
-	});
-	//所有依赖全部加载完成
-	if(dn == cn){
-		fireFactory(id,args,factory);
-	}
-	//检测依赖情况
-	checkDeps();
+    //将主模块main注册到modules中
+    if(!modules[id]){
+
+        //将主模块main依赖中的name转换为id，id其实是模块的对应javascript文件的全路径
+        var depsId = []; 
+        deps.map(function(name){
+            depsId.push(foioRequireJS.getScriptId(name));
+        });
+
+        //将主模块main注册到modules列表中
+        modules[id]  = {
+            id: id, 
+            state: 1,//模块的加载状态   
+            deps:depsId,//模块的依赖关系
+            callback: callback,//模块的回调函数
+            exports: null,//本模块回调函数callback的返回结果，供依赖于该模块的其他模块使用
+            color:0,
+        };
+        //这里为main入口函数，需要将它的id也加入loadings列表，以便触发回调
+        loadings.unshift(id);                       
+    }
+    //加载依赖模块
+    foioRequireJS.loadDepsModule(id);
 }
+
 ```
 
-这就是require函数的基本逻辑框架了，代码中使用了loadJS()，checkDeps(), 
-fireFactory()等函数。其中loadJS函数我们章节“RequireJS如何异步加载js模块”中已经实现了。
-下面我们分别来看看checkDeps()和fireFactory()的实现。
+可以说loadDepsModule是模块加载系统中最重要的函数了。 loadDepsModule函数主要是递归的加载一个模块的依赖模块，通过loadJS在dom结构中插入script元素来完成js文件的载入和执行。这里loadJS的callback函数也很值得研究。 每一个模块都是通过define函数定义的，由于callback函数在模块加载完成后才会执行,所以callback函数执行时模块已经存在于modules中了。相应的，我们也要将该模块放入loadings队列以便检查执行情况；同时递归的调用 loadDepsModule加载该模块的依赖模块。loadJS的在浏览器的onload事件触发时执行，这是整个模块加载系统的驱动力。
 
-checkDeps是用来检查加载队列loadings中模块的依赖情况的，
-一个模块的依赖全部加载完成后，就调用fireFactory执行该模块的回函数。
 
 ``` javascript
 //by foio.github.io
-function checkDeps(){
-	//遍历加载列表
-	for(var i = loadings.length, id; id = loadings[--i]){
-		var obj = modules[id], deps = obj.deps, allloaded = true;									
-		//遍历每一个模块的加载
-		for(var key in deps){
-			//如果存在未加载完的模块，则退出内层循环
-			if(modules[key].state !== 2){
-				allloaded = false;
-				break;
-			}
-		}
+foioRequireJS.loadDepsModule = function(id){
+    //依次处理本模块的依赖关系
+    modules[id].deps.map(function(el){
+        //如果模块还没开始加载，则加载模块所在的js文件
+        if(!modules[el]){
+            foioRequireJS.loadJS(el,function(){
+                //模块开始加载时，放入加载队列，以便检测加载情况
+                loadings.unshift(el);                       
+                //递归的调用loadModule函数加载依赖模块
+                foioRequireJS.loadDepsModule(el);
+                //加载完成后执行依赖检查，如果依赖全部加载完成就执行callback函数
+                foioRequireJS.checkDeps();  
+            });
+        }
+    });
+}   
 
-		//如果所有模块已经加载完成
-		if(allloaded){
-			loadings.splice(i,1); //从loadings列表中移除已经加载完成的模块							
-			fireFactory(obj.id, obj.deps, obj.factory);
-		}
-	}		
-}
 ```
 
-fireFactory的具体逻辑见如下代码，它的工作时从各个依赖模块收集返回值，然后调用factory：
+下面我们再来分析一下checkDeps函数，该函数在每次onload事件触发时执行，检查模块列表中是否已经有满足执行条件的模块，然后开始执行。checkDeps也有一个小技巧，就是当存在满足执行条件的模块时会触发一次递归，因为该模块执行完成后，可能使得依赖于该模块的其他模块也满足了执行条件。
 
 ``` javascript
-//by foio.github.io
-function fireFactory(id,deps,factory){
-	//遍历id模块的依赖，为factory准备参数
-	for (var i = 0, array = [] , d; d = deps[i];) {
-		array.push(modules[d].exports);
-	};
-	//在context对象上调用factory方法
-	var ret = factory.apply(context,array);	
-	//记录模块的返回结果，本模块的返回结果可能作为依赖该模块的其他模块的回调函数的参数
-	if(ret != void 0){
-		modules[id].exports = ret;
-	}
-	return ret;
+//检测模块的依赖关系是否处理完毕，该函数在每一次js的onload事件都会触发一次
+foioRequireJS.checkDeps = function(){
+    //遍历加载列表
+    for(var i = loadings.length, id; id = loadings[--i];){
+        var obj = modules[id], deps = obj.deps, allloaded = true;                                   
+        //遍历每一个模块的加载
+        foioRequireJS.checkCycle(deps,id,colorbase++);
+        for(var key in deps){
+            //如果存在未加载完的模块，则退出内层循环
+            if(!modules[deps[key]] || modules[deps[key]].state !== 2){
+                allloaded = false;
+                break;
+            }
+        }
+
+        //如果所有模块已经加载完成
+        if(allloaded){
+            loadings.splice(i,1); //从loadings列表中移除已经加载完成的模块                          
+            //执行模块的callback函数
+            foioRequireJS.fireFactory(obj.id, obj.deps, obj.callback);
+            //该模块执行完成后可能使其他模块也满足执行条件了，继续检查，直到没有模块满足allloaded条件
+            foioRequireJS.checkDeps();
+        }
+    }       
+}   
+```
+
+最后我们分析一下，具体的执行函数fireFactory。我们知道，无论是require函数还是define函数，都有一个参数列表，fireFactory首先处理的问题就是收集各个依赖模块的返回值，构建callback函数的参数列表；然后调用callback函数，同时记录模块的返回值，以便其他依赖于该模块的模块作为参数使用。
+
+``` javascript
+//fireFactory的工作是从各个依赖模块收集返回值，然后调用该模块的后调函数
+foioRequireJS.fireFactory = function(id,deps,callback){
+    var params = [];
+    //遍历id模块的依赖，为calllback准备参数
+    for (var i = 0, d; d = deps[i++];) {
+        params.push(modules[d].exports);
+    };
+    //在context对象上调用callback方法
+    var ret = callback.apply(global,params);    
+    //记录模块的返回结果，本模块的返回结果可能作为依赖该模块的其他模块的回调函数的参数
+    if(ret != void 0){
+        modules[id].exports = ret;
+    }
+    modules[id].state = 2; //标志模块已经加载并执行完成
+    return ret;
 }
 ```
 
-这些内容是我用将近一周的业余时间的研究心得，希望对你有帮助。当然，这些代码都只是javascript加载系统的基本框架，如果有考虑疏忽的地方，还请你指正。我计划在最近两周给出javascript模块加载系统的一个完整的可用demo。
+这些内容是我用将近一周的业余时间的研究心得，希望对你有帮助。当然，这些代码都只是javascript加载系统的基本框架，如果有考虑疏忽的地方，还请你指正。文中的代码只是片段，完整的代码在我的github：[https://github.com/foio/MyRequireJS](https://github.com/foio/MyRequireJS)
 
-原则上本文是禁止转载的，但是如果你非要转载我也无法阻止。但是请各位转载时务必注明出处，尊重我的劳动成果。
+如果你认真的读到这里，我有理由相信你是一个对技术有追求的人，我和你是同类人。 本文是禁止转载的，希望我们互相尊重大家的劳动成果。
