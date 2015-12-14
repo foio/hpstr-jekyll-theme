@@ -1,9 +1,9 @@
 ---
 layout: post
-title: angular路由正则表达式
-description: "angular路由正则表达式"
+title: angular正则表达式路由
+description: "angular正则表达式路由"
 modified: 2015-12-14
-tags: [javascript]
+tags: [javascript,angular,regex]
 image:
   background: triangular.png
 comments: true

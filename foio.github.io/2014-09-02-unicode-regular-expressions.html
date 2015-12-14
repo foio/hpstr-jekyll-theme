@@ -1,0 +1,65 @@
+<p>Unicode字符多种多样，除去ascii中的字母、数字、标点和中文字符，还包括其它多种语言和多种符号，有些符号甚至很难打出来，这时候该如何表示呢？接下来我们首先简单的介绍以下Unicode的编码特点，然后针对不同的场景分别介绍如何写正则表达式。</p>
+
+<hr />
+
+<h3 id="unicode">1.Unicode的编码特点</h3>
+
+<p>每一个Unicode字符都对应一个唯一的Unicode编码，一种语言的Unicode编码是在一个连续区间内的，除了这些基本特征外，Unicode编码还有三种属性Property、 Block、Script。我们可以用<code>\p</code>引用Unicode的属性，</p>
+
+<blockquote>
+  <p><strong>Property</strong>用于表示字符本身的功能，比如符号，空格，字母等。可以用<code>\p{L}</code>表示字母、文字，而对应<code>\P{L}</code>表示不是字母、文字。Property是与语言无关的，即<code>\p{L}</code>用于表示所有语言的字符。比如：</p>
+</blockquote>
+
+<p><code>
+L或者Letter:所有语言的字符
+P或者Punctuation:所有语言的标点 
+S或者Separator:所有语言的分隔符
+</code></p>
+
+<blockquote>
+  <p><strong>Block</strong>表示Uincode的一个区间，某种语言的字符通常是落在同一区间的，所以可以通过Block粗略表示某类语言的字符，比如<code>\p{InHebrew}</code>表示希伯莱语字符，<code>\p{InCJK_Compatibility}</code>表示兼容CJK（汉语、韩语、日本语）的字符。如下表所示：每一个Block表示方法都对应一段编码区间：</p>
+</blockquote>
+
+<p><code>
+InCJK_Compatibility:\u3300–\u33F
+InHebrew:\u0590–\u05F
+</code></p>
+
+<blockquote>
+  <p><strong>Script</strong>表示Uincode的一个书写系统，比如<code>\p{Greek}</code>表示希腊语字符，<code>\p{Han}</code>表示汉语（中文字符），比如如下列举了希腊，汉语和阿拉伯书写系统。</p>
+</blockquote>
+
+<p><code>
+Greek
+Han
+Arabic
+</code></p>
+
+<hr />
+
+<h3 id="unicode-1">2.Unicode正则应用案例</h3>
+
+<ul>
+  <li>匹配单个Unicode字符，下面例子去掉”发”字。</li>
+</ul>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">String</span> <span class="n">testStr</span> <span class="o">=</span> <span class="err">“</span><span class="n">发财了</span><span class="err">，</span><span class="n">发了</span><span class="err">”</span><span class="o">;</span>
+<span class="n">testStr</span><span class="o">.</span><span class="na">replaceAll</span><span class="o">(</span><span class="s">&quot;\u53d1&quot;</span><span class="o">,</span><span class="n">testStr</span><span class="o">);</span></code></pre></div>
+
+<ul>
+  <li>匹配所有标点符号，下面例子去掉所有标点符号</li>
+</ul>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">String</span> <span class="n">testStr</span> <span class="o">=</span> <span class="err">“</span><span class="n">发财了</span><span class="err">，</span><span class="n">发了</span><span class="err">！</span><span class="o">&lt;</span><span class="n">Software</span> <span class="n">Engineer</span> <span class="n">is</span> <span class="n">great</span><span class="o">!&gt;</span><span class="err">”</span><span class="o">;</span>
+<span class="n">testStr</span><span class="o">.</span><span class="na">replaceAll</span><span class="o">(</span><span class="s">&quot;\\pP&quot;</span><span class="o">,</span><span class="n">testStr</span><span class="o">);</span></code></pre></div>
+
+<ul>
+  <li>匹配某种语言，下面例子去掉所有汉字</li>
+</ul>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">String</span> <span class="n">testStr</span> <span class="o">=</span> <span class="err">“</span><span class="n">发财了</span><span class="err">，</span><span class="n">发了</span><span class="err">！</span><span class="o">&lt;</span><span class="n">Software</span> <span class="n">Engineer</span> <span class="n">is</span> <span class="n">great</span><span class="o">!&gt;</span><span class="err">”</span><span class="o">;</span>
+<span class="n">testStr</span><span class="o">.</span><span class="na">replaceAll</span><span class="o">(</span><span class="s">&quot;\\pHan&quot;</span><span class="o">,</span><span class="n">testStr</span><span class="o">);</span></code></pre></div>
+
+<hr />
+<p>关于uicode编码属性可以参考<a href="http://www.regular-expressions.info/unicode.html">这篇文章</a>。&lt;/br&gt;
+关于Unicode码表可以参考<a href="http://zh.wikibooks.org/wiki/Unicode">这里</a></p>

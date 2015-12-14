@@ -1,0 +1,109 @@
+<p>weka是机器学习和数据挖掘库java库，提供有GUI界面版本和类库版本。weka是GNU通用公共许可证下发布的开源软件，这意味着我们在自己的项目自由的使用，并可以在开放源代码的情况下改进weka。在使用weka之前，我们首先要将自己的数据集转换为weka支持的格式。weka的数据格式请参考<a href="http://www.cs.waikato.ac.nz/ml/weka/arff.html">arff格式说明</a>。学习weka库最好先有一下机器学习方面的基础知识，然后学习官方example。接下来简单说明如何使用weka库的kmeans算法。</p>
+
+<hr />
+
+<p><strong>训练数据集集</strong></p>
+
+<p>```
+@relation race</p>
+
+<p>@attribute height NUMERIC
+@attribute weight NUMERIC
+@attribute eyeColor NUMERIC
+@attribute hairColor NUMERIC</p>
+
+<p>@data
+170,70,1,1
+180,70,2,2
+175,70,1,1
+200,80,2,3
+210,80,2,1
+200,70,2,2
+150,50,1,1
+155,50,1,1
+170,70,1,1
+173,70,1,1
+170,70,1,2
+```</p>
+
+<p><strong>测试数据集集</strong></p>
+
+<p>```
+@relation race</p>
+
+<p>@attribute height NUMERIC
+@attribute weight NUMERIC
+@attribute eyeColor NUMERIC
+@attribute hairColor NUMERIC</p>
+
+<p>@data
+170,71,1,1
+200,80,2,2
+```</p>
+
+<hr />
+
+<h3 id="section">代码</h3>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">KmeansTest</span> <span class="o">{</span>
+	  <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+		    <span class="n">File</span> <span class="n">trainFile</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">File</span><span class="o">(</span><span class="s">&quot;race_train.arff&quot;</span><span class="o">);</span>
+		    <span class="n">File</span> <span class="n">testFile</span>  <span class="o">=</span> <span class="k">new</span> <span class="nf">File</span><span class="o">(</span><span class="s">&quot;race_test.arff&quot;</span><span class="o">);</span>
+		    <span class="n">ArffLoader</span> <span class="n">atf</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">ArffLoader</span><span class="o">();</span>  
+		    <span class="c1">// load data</span>
+		    <span class="n">atf</span><span class="o">.</span><span class="na">setFile</span><span class="o">(</span><span class="n">trainFile</span><span class="o">);</span>  
+		    <span class="n">Instances</span> <span class="n">train</span> <span class="o">=</span> <span class="n">atf</span><span class="o">.</span><span class="na">getDataSet</span><span class="o">();</span>
+		    <span class="n">atf</span><span class="o">.</span><span class="na">setFile</span><span class="o">(</span><span class="n">testFile</span><span class="o">);</span>  
+		    <span class="n">Instances</span> <span class="n">test</span> <span class="o">=</span> <span class="n">atf</span><span class="o">.</span><span class="na">getDataSet</span><span class="o">();</span> 
+		    <span class="c1">// build clusterer</span>
+		    <span class="n">SimpleKMeans</span> <span class="n">clusterer</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">SimpleKMeans</span><span class="o">();</span>
+		    <span class="n">clusterer</span><span class="o">.</span><span class="na">setNumClusters</span><span class="o">(</span><span class="mi">2</span><span class="o">);</span>
+		    <span class="n">clusterer</span><span class="o">.</span><span class="na">buildClusterer</span><span class="o">(</span><span class="n">train</span><span class="o">);</span>   
+		    <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">clusterer</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+		    <span class="c1">// output predictions	    </span>
+		    <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">test</span><span class="o">.</span><span class="na">numInstances</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+		      <span class="kt">int</span> <span class="n">cluster</span> <span class="o">=</span> <span class="n">clusterer</span><span class="o">.</span><span class="na">clusterInstance</span><span class="o">(</span><span class="n">test</span><span class="o">.</span><span class="na">instance</span><span class="o">(</span><span class="n">i</span><span class="o">));</span>
+		      <span class="kt">double</span><span class="o">[]</span> <span class="n">dist</span> <span class="o">=</span> <span class="n">clusterer</span><span class="o">.</span><span class="na">distributionForInstance</span><span class="o">(</span><span class="n">test</span><span class="o">.</span><span class="na">instance</span><span class="o">(</span><span class="n">i</span><span class="o">));</span>
+		      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">((</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="o">));</span>
+		      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="s">&quot; - &quot;</span><span class="o">);</span>
+		      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="n">cluster</span><span class="o">);</span>
+		      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="s">&quot; - &quot;</span><span class="o">);</span>
+		      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">print</span><span class="o">(</span><span class="n">Utils</span><span class="o">.</span><span class="na">arrayToString</span><span class="o">(</span><span class="n">dist</span><span class="o">));</span>
+		      <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">();</span>
+		    <span class="o">}</span> 
+		  <span class="o">}</span>
+<span class="o">}</span></code></pre></div>
+
+<hr />
+
+<h3 id="section-1">结果如下</h3>
+
+<p>```
+//kMeans聚类结果信息如下，比较重要的是每个聚类的中心以及误差
+kMeans
+======</p>
+
+<p>Number of iterations: 2
+Within cluster sum of squared errors: 1.7463888888888888
+Missing values globally replaced with mean/mode</p>
+
+<p>Cluster centroids:
+                         Cluster#
+Attribute    Full Data          0          1
+                  (11)        (4)        (7)
+============================================
+height        177.5455      197.5   166.1429
+weight         68.1818         75    64.2857
+eyeColor        1.3636          2          1
+hairColor       1.4545          2     1.1429</p>
+
+<p>//分类结果如下
+1 - 1 - 0.0,1.0
+2 - 0 - 1.0,0.0</p>
+
+<p>```</p>
+
+<blockquote>
+  <p>更多资料请阅读<a href="http://www.cs.waikato.ac.nz/ml/weka/">weka官网</a>。</p>
+</blockquote>
+

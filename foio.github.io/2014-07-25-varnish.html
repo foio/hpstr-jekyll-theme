@@ -1,0 +1,66 @@
+<p>Varnish是一款高性能的开源HTTP加速器，一般用来和Nginx、Apache等搭配使用，组建一个高效率的Web服务器。varnish是一个cache型的HTTP反向代理。</p>
+
+<p>常见的工作方式是：某个负责接受新HTTP连接的线程开始等待用户，如果有新的HTTP连接过来，它总负责接收，然后叫醒某个等待中的线程。Worker线程读入HTTP请求的URI，查找已有的object，如果命中则直接返回并回复用户。如果没有命中，则需要将所请求的内容，从后端服务器中取过来，存到缓存中，然后再回复。</p>
+
+<p>典型的结构如下：</p>
+
+<figure>
+    <img src="/images/varnish.jpg" />
+</figure>
+
+<p>本文将简单介绍ubuntu server下安装和配置varnish的方法。</p>
+
+<h2 id="varnish">安装varnish</h2>
+
+<p>使用ubuntu软件包管理工具安装varnish。</p>
+
+<p><code>
+apt-get install varnish
+</code></p>
+
+<h2 id="varnish-1">配置varnish</h2>
+
+<h3 id="etcdefaultvarnish">1. /etc/default/varnish</h3>
+
+<p><code>
+DAEMON_OPTS="-a :80 \                                             
+             -T localhost:6082 \
+             -f /etc/varnish/default.vcl \
+             -S /etc/varnish/secret \
+             -s malloc,100m"
+</code></p>
+
+<p>各个字段的含义如下：
+ &gt;<br />
+ <code>-a :80</code>表示监听端口为80,<code>-T
+ localhost:6082</code>表示控制端口为本机6082,即可以通过localhost:6802访问varnish的控制信息,
+ <code>-f /etc/varnish/default.vcl</code>表示将请求forword到由vcl配置的机器,
+ <code>-s malloc,100m</code> 表示使用100m的内存</p>
+
+<h3 id="etcvarnishdefaultvcl">2.  /etc/varnish/default.vcl</h3>
+
+<p><code>
+backend default {
+    .host = "127.0.0.1";
+    .port = "8080";
+}
+</code></p>
+
+<p>backend default定义默认的后端服务器的ip和端口，也即nginx监听的端口。当然vcl可以定义各种复杂的转发策略，这个超出了本文的范围。配置好后可以重新启动varnish了</p>
+
+<p>```
+/etc/init.d/varnish restart
+ * Stopping HTTP accelerator varnishd      [ok]
+ * Starting HTTP accelerator varnishd      [ok]</p>
+
+<p>```</p>
+
+<h2 id="varnish-2">测试varnish</h2>
+
+<p>配置好varnish后，浏览站点，发现HTTP Response头中多了:</p>
+
+<p><code>
+X-Varnish	1666066465 1666066458
+</code></p>
+
+<p>上面的头信息表示varnish正常工作了。我们也可以使用varnish提供的命令行工具<code>varnishstat</code>分析varnish的缓存状态,可以使用<code>varnishlog</code>查看varnish的和客户端以及后端的通信信息。</p>
