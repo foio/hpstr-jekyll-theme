@@ -230,7 +230,7 @@ monkeyLoader('b.js',callbackB,true);
 
 ###3.基于fis3的localstorage集成解决方案
 
-[FIS3](http://fis.baidu.com/)作为一个优秀的前端工程化解决方案，其在业界的影响无处不在。作为狼长的一员，我们在项目中也大量使用FIS3，下面我们讨论一下如何将localstorage集成到FIS3的编译流程中。
+[FIS3](http://fis.baidu.com/)作为一个优秀的前端工程化解决方案，其在业界的影响无处不在。作为狼厂的一员，我们在项目中也大量使用FIS3，下面我们讨论一下如何将localstorage集成到FIS3的编译流程中。
 
 我们的目的是将通过FIS3工程化处理后的文件列表传递到monkeyLoader，以实现基于localstorage的加载。FIS3提供了静态资源映射表，当某个文件包含字符 __RESOURCE_MAP__，就会用表结构数据替换此字符，而该表记录了各个原始静态资源经过工程化后的目标文件。基于此，我们只需要对monkeyLoader进行简单的封装即可。下面是具体的封装代码：
 
@@ -269,4 +269,4 @@ fisMonkeyLoader根据__RESOURCE_MAP__找到原始资源对应的经过工程化�
 
 ###4.通过预加载解决首次加载过慢问题
 
-针对目前常见的hybrid加载，我们可以通过让native客户端预加载webview从而提升首次速度。我们的实现是：客户端在启动时打开一个1px大小(用户不可见)的webview用于提前加载某些重要的页面，而这些页面通过上文中的localstorage机制存储了几乎全部js和css静态资源，从而得到webview秒开的体验。
+针对目前常见的hybrid架构，我们可以通过让native客户端预加载webview从而提升首次速度。我们的实现是：客户端在启动时打开一个1px大小(用户不可见)的webview用于提前加载某些重要的页面，而这些页面通过上文中的localstorage机制存储了几乎全部js和css静态资源，从而得到webview秒开的体验。

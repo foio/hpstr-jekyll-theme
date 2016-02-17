@@ -204,7 +204,7 @@ function checkMyJs(){
                         if(qScript.onload){
                             qScript.onload(); 
                         }
-                        qScript.done = false;
+                        qScript.done = true;
                     }
                 }
             };
