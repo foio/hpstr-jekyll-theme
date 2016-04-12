@@ -81,7 +81,7 @@ window.addEventListener('load', function(e) {
 ```
 
 ###(2).超出大小限制的问题
-Application Cache的W3C标准中并没有对大小限制做出详细的描述。因此浏览器实现起来也是参差不齐，为了最大化的使用离线缓存，我们应该清楚自己业务的目标浏览器的离线缓存大小限制，使用chrome://appcache-internals/可以轻易的管理chrome浏览器的离线缓存。我们可以写一个DEMO采用二分搜索法，不断的测试浏览器的Application Cache大小限制，直到触发相应的error事件。可以通过监听Application的error事件来处理超出离线缓存大小限制的情况：
+Application Cache的W3C标准中并没有对大小限制做出详细的描述。因此浏览器实现起来也是参差不齐，为了最大化的使用离线缓存，我们应该清楚自己业务的目标浏览器的离线缓存大小限制，使用chrome://appcache-internals/可以轻易的管理chrome浏览器的离线缓存。我们可以写一个DEMO,采用二分搜索法，不断的测试浏览器的Application Cache大小限制，直到触发相应的error事件。这个链接可以[测试Application Cache的大小限制](http://www.der-schepp.de/appcache-default-size/)。通过监听Application的error事件来能够处理超出离线缓存大小限制的情况：
 
 ``` javascript
 window.applicationCache.addEventListener('error',function(e){
@@ -91,7 +91,7 @@ window.applicationCache.addEventListener('error',function(e){
 });
 
 ```
-实现这个链接可以[测试Application Cache的大小限制](http://www.der-schepp.de/appcache-default-size/)。离线缓存的是一套网页加速方案，超出Application Cache的大小限制后，会对我们的应用有不同的影响，具体表现就是：
+离线缓存的是一套网页加速方案，超出Application Cache的大小限制后，会对我们的应用有不同的影响，具体表现就是：
 
 ```
 首次下载缓存时超出大小，所有资源都不会缓存，而是请求网络，应用功能正常。
