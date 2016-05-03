@@ -2,7 +2,7 @@
 layout: post
 title: 前端高性能动画最佳实践
 description: "高性能动画,animation,最佳实践,will-change,"
-modified: 2016-03-20
+modified: 2016-04-30
 tags: [javascript,高性能动画]
 image:
   background: triangular.png
