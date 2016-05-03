@@ -100,7 +100,6 @@ RequestAnimationFrame(step);
 但是由于`RequestAnimationFrame`支持程度还不高(手机浏览器普遍不支持)，我们可以结合`RequestAnimationFrame`和`setInterval`实现一套逐渐增强和优雅降级的方案,下面是兼容各个浏览器的终极版本:
 
 ``` javascript
-``` javascript
 function getAnimationFrame() {
     if (window.requestAnimationFrame) { //较新浏览器
         return {
