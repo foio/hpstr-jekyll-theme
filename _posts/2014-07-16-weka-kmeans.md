@@ -55,9 +55,9 @@ weka是机器学习和数据挖掘库java库，提供有GUI界面版本和类库
 ----
 
 
-###代码
+###1.代码
 
-{% highlight java %}
+``` java
 public class KmeansTest {
 	  public static void main(String[] args) throws Exception {
 		    File trainFile = new File("race_train.arff");
@@ -86,11 +86,11 @@ public class KmeansTest {
 		    } 
 		  }
 }
-{% endhighlight  %}
+```
 
 -----
 
-###结果如下
+###2.结果如下
 
 ```
 //kMeans聚类结果信息如下，比较重要的是每个聚类的中心以及误差

@@ -6,7 +6,7 @@ modified: 2015-11-08
 tags: [javascript  RequireJS]
 image:
   background: triangular.png
-comments: true
+comments: true 
 ---
 
 近年来，前端变的越来越重，页面中的javascript代码量上升了一个量级，为了便于维护和团队协作，模块化是必经之路。针对javascript模块化，业界逐渐产出两种方案AMD和CMD，它们有什么区别呢？看看大牛玉帛在知乎上的回答:[http://www.zhihu.com/question/20342350/answer/14828786](http://www.zhihu.com/question/20342350/answer/14828786)。
@@ -106,12 +106,12 @@ require(id,['c'],function(c){
 
 要保证javascript模块的执行顺序，首先必须组织好依赖关系。
 
+
 ###(1)组织依赖关系
 
 为了组织RquireJS需要哪些数据结构呢？看起来无从下手，我们可以对问题进行拆分。
 
-####<1>.模块放在哪里，如何标记模块的加载状态？
-
+####[1].模块放在哪里，如何标记模块的加载状态？
 moudules存储了所有已经开始加载的模块，包括加载状态信息、依赖模块信息、模块的回调函数、以及回调函数callback返回的结果。
 
 ``` javascript
@@ -126,10 +126,10 @@ modules = {
 	}	
 	...	
 }
+
 ```
 
-
-####<2>.正在加载但是还没有加载完成的模块id列表
+####[2].正在加载但是还没有加载完成的模块id列表
 
 每个脚本加载完成事件onload触发时，都需要检查loading队列，确认哪些模块的依赖已经加载完成，是否可以执行
 
@@ -141,7 +141,6 @@ loadings = [
 	...
 ]
 ```
-
 
 ###(2). define函数的基本实现
 

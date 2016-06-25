@@ -13,34 +13,34 @@ comments: true
 
 -----
 
-##两个问题
-####1.元素过多时的性能问题
+##1.两个问题
+###(1).元素过多时的性能问题
 假设有一个多行多列的表格，我们想让用户单击每个单元格都能看到与其中内容相关的更多信息（比如，通过提示条）。为此，可以为每个单元格都绑定click事件：
 
-{% highlight javascript %}
+``` javascript
 $(“info_table td”).bind(“click”, function(){//TODO});
-{% endhighlight  %}
+```
 
 问题是，如果表格中要绑定单击事件的有10列500行，那么查找和遍历5000个单元格会导致脚本执行速度明显变慢，而保存5000个td元素和相应的事件处理程序也会占用大量内存。
 
 
-####2.动态添加元素的无法直接绑定事件
+###(2).动态添加元素的无法直接绑定事件
 假设一个动态翻页的表格，每一次翻页都是重新插入的表格。通过给第一页添加事件，对后续通过js异步加载的页面没有作用。
 
 ----
 
-##基本解决方法
+###(3)基本解决方法
 事件委托可以解决上述两个问题。具体到代码上，只要用jQuery1.3新增的.live()方法代替.bind()方法即可：
 
-{% highlight javascript %}
+``` javascript
 $(“#info_table td”).live(“click”,function(){//TODO});
-{% endhighlight  %}
+```
 
 这里的.live()方法会把click事件绑定到$(document)对象，而且只需要给$(document)绑定一次，就能够处理后续动态加载表格。在接收到任何事件时，$(document)对象都会检查事件类型和事件目标，如果是click事件且事件目标是td，那么就执行委托给它的处理程序。
 
 -----
 
-##基本方法的问题
+###(4).基本方法的问题
 
 到目前为止，一切似乎很完美。可惜，事实并非如此。因为.live()方法并不完美，它有如下几个主要缺点：
 
@@ -52,9 +52,9 @@ $(“#info_table td”).live(“click”,function(){//TODO});
 
 jQuery从1.4开始支持在使用.live()方法时配合使用一个上下文参数：
 
-{% highlight javascript %}
+``` javascript 
 $(“td”,$(“#info_table”)[0]).live(“click”,function(){//TODO});
-{% endhighlight  %}
+```
 
 这样，“受托方”就从默认的$(document)变成了$(“#info_table”)[0]，节省了冒泡的旅程。不过，与.live()共同使用的上下文参数必须是一个单独的DOM元素，所以这里指定上下文对象时使用的是$(“#info_table”)[0]，即使用数组的索引操作符来取得的一个DOM元素。
 
@@ -62,12 +62,12 @@ $(“td”,$(“#info_table”)[0]).live(“click”,function(){//TODO});
 
 -----
 
-##更好的解决办法
+###(5).更好的解决办法
 使用.delegate()，前面的例子可以这样写：
 
-{% highlight javascript %}
+``` javascript 
 $(“#info_table”).delegate(“td”,”click”,function(){//TODO});
-{% endhighlight  %}
+```
 
 使用.delegate()有如下优点：
 
@@ -78,9 +78,9 @@ $(“#info_table”).delegate(“td”,”click”,function(){//TODO});
 
 在jQuery1.7中 .delegate()已被.on()取代,.on与.delegate主要区别在参数顺序。使用.on前面的例子可以这样写：
 
-{% highlight javascript %}
+``` javascript 
 $(“#info_table”).on(”click”,“td”,function(){//TODO;});
-{% endhighlight  %}
+```
 
 可见，.delegate()与.on()方法是一个相对完美的解决方案。但在DOM结构简单的情况下，也可以使用.live()。
 >提示：使用事件委托时，如果注册到目标元素上的其他事件处理程序使用.stopPropagation()阻止了事件传播，那么事件委托就会失效。
