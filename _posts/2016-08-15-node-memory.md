@@ -203,8 +203,96 @@ function getFromCache(key){
 [WeakMap](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/WeakMap)是ES6标准中新引入的一种类似字典的数据结构，和普通字典数据结构不同的是，当WeakMap中key没有其他引用，并且value也没有除key之外的引用时，value可以被垃圾回收，这是一种程序内缓存的理想选择。
 
 
+##6.堆外内存
+
+在node中，我们不可避免的需要操作大内存，而堆内内存大小的限制显然无法满足我们的要求。为此，node通过内置的全局Buffer模块提供堆外的内存使用方法。Buffer是一个C++与Javascript结合的模块，其内存分配策略，也非常值得我们研究。我们知道大部分Javascript对象所使用的内存都是很小的，如果每一次都向操作系统申请，就必须频繁地进行系统调用；为了解决这个问题，node使用C++层面申请一大块内存，然后按需分配给Javascript的策略；也就是*nix系统常用的slab内存分配策略，这是一种典型的对时间和空间的折衷算法(time/space trade-off)。
+
+slab是一块提前申请好地固定大小的内存，一个slab有三种状态：full、partial、empty。node层面提供了一个SlowBuffer类，封装C++的api，用于申请真实的物理内存，可以简单地将一个slab理解为一个SlowBuffer对象。node中维护着一个名为pool的指针，它指向当前slab(SlowBuffer对象)。向系统申请slab的过程可用如下伪代码表示：
+
+``` javascript
+var pool;
+function allocateSlab(){
+	pool = new SlowBuffer();
+	pool.used = 0;
+}
+```
+
+###6.1 小内存(<4kB)的分配
+
+一个slab的大小为8KB(Buffer.poolSize)，node中通过Buffer.poolSize定义。当我们需要创建一个长度小于4kB的Buffer对象时，会首先判断当前slab的剩余空间是否足够，如果剩余空间足够，则在当前slab上为Buffer对象分配内存，否则创建一个新的slab块，并在新的slab上为Buffer对象分配内存。
+
+
+``` javascript
+if(!pool || pool.lengh - pool.used < this.length){
+	allocateSlab(); //向系统申请新的slab
+	allocateBuffer(); //给buffer对象分配内存
+}else{
+	allocateBuffer(); //给buffer对象分配内存
+}
+```
+
+从当前slab上为Buffer分配内存的算法也很容易理解，只需要将Buffer指向slab的某段内存，并调整pool的length和used等属性：
+
+```
+function allocateBuffer(){
+	this.parent = pool; //buffer的parent属性指向当前slab
+	this.offset = pool.used; //buffer的offset属性指向当前slab可用内存段的开始位置
+	pool.used += this.length; //调整buffer的已使用空间
+}
+```
+
+由此可见，一个slab(SlowBuffer对象)可供多个小内存的Buffer共用：
+
+![Alt text](/images/slow-buffer.png)
+
+
+在写本文时，node官方已经不建议使用`new Buffer()`创建buffer对象了，官方提供了更新的`Buffer.alloc()`和`Buffer.allocUnsafe()`。其中`Buffer.alloc()`在创建Buffer对象时会对内存进行初始化，并且不会使用slab策略；而`Buffer.allocUnsafe()`则是使用slab算法分配一块未初始化的内存，因此其性能要比`Buffer.alloc()`高很多。因此我们应该使用`Buffer.allocUnsafe()`替换来的`new Buffer()`。
+
+###6.2 大内存(>4kB)的分配
+
+对于大于4KB的Buffer对象，其大小甚至可能超过一个slab的大小，系统就无法使用固定大小的slab分配算法了。值得注意的是，node对单个Buffer大小是有上限的(buffer.kMaxLength)，在32系统上其上限接近1GB(2^30-1)，而在64位系统上其上限则接近2GB(2^31-1)。
+
+
+###6.3  slab算法的代价
+
+鱼与熊掌不可兼得，上文中提到slab算法一种时间和空间的折衷算法。为了提高内存的分配速度，该算法可能导致内存碎片：当一个slab上的剩余空间不足于容纳新申请的Buffer的大小，或者新申请Buffer大于等于4kb(Buffer.poolSize)时，就需要创建新的slab，原来slab上剩余的空间就浪费了。我们写个小程序证明一下我们的猜想:
+
+``` javascript
+function testBufferSlab(size){
+	var itt = 10000;
+	var store = [];
+	var rss = process.memoryUsage().rss;
+	var tmpMem;
+	for(var i =0 ;i < itt; i++){
+		store.push(new Buffer(1));
+		tmp = Buffer(size);
+		if(i/1000){
+			global.gc();
+		}
+	}
+	var nr = process.memoryUsage().rss
+	console.log((((nr - rss) / 1024 / 1024).toFixed(2)));
+}
+```
+
+上述程序，在一万次循环中申请了一个1字节的全局缓存，并申请了size大小的临时缓存(其引用会在循环中被垃圾回收)。我们分别给`testBufferSlab`传递两个特殊的参数：`Buffer.poolSize`和`Buffer.poolSize/2-1`，并观察结果时，奇怪的现象发生了(*申请较大的Buffer时竟然消耗更少的内存*)：
+ 
+``` javascript
+testBufferSlab(Buffer.poolSize);
+node --expose-gc test.js
+output: 54.78
+```
+
+``` javascript
+testBufferSlab(Buffer.poolSize/2-1);
+node --expose-gc test.js
+output: 5.2
+```
+究其原因就是：当新申请的Buffer的小于4Kb时(Buffer.poolSize/2)，会使用slab算法，即便当前Buffer块已经没有引用了，只要其对应slab上还有其他Buffer指向时，整个slab内存就无法释放，这样就会造成内存碎片。
+
 ---
 参考文章：
+
 https://www.ibm.com/developerworks/cn/java/j-lo-JVMGarbageCollection/
 
 https://www.zhihu.com/question/20018826
@@ -218,3 +306,12 @@ http://taobaofed.org/blog/2016/04/15/how-to-find-memory-leak/
 https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/WeakMap
 
 https://github.com/promises-aplus/promises-spec/issues/179
+
+https://www.ibm.com/developerworks/cn/linux/l-linux-slab-allocator/
+
+https://nodejs.org/api/buffer.html
+
+http://stackoverflow.com/questions/14009048/what-makes-node-js-slowbuffers-slow
+
+https://github.com/nodejs/node-v0.x-archive/issues/4525
+
