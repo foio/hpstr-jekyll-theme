@@ -280,13 +280,13 @@ function testBufferSlab(size){
 ``` javascript
 testBufferSlab(Buffer.poolSize);
 node --expose-gc test.js
-output: 54.78
+output: 5.2
 ```
 
 ``` javascript
 testBufferSlab(Buffer.poolSize/2-1);
 node --expose-gc test.js
-output: 5.2
+output: 54.78
 ```
 究其原因就是：当新申请的Buffer的小于4Kb时(Buffer.poolSize/2)，会使用slab算法，即便当前Buffer块已经没有引用了，只要其对应slab上还有其他Buffer指向时，整个slab内存就无法释放，这样就会造成内存碎片。
 
