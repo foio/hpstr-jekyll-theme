@@ -190,7 +190,7 @@ module.exports = connect(mapStateToProps)(TodoApp);
 
 ![Alt text](/images/redux-component-tree.png)
 
-####3.3 理解Redux的基本规范
+####3.3 理解Redux的默认性能优化
 
 
 Redux官方对容器型组件和全局状态树有两个基本的假设，违背这些假设将使得Redux的默认性能优化无法起作用：
