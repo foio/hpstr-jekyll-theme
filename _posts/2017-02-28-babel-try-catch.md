@@ -43,9 +43,9 @@ var test = function() {
 
 
 
-![babel插件转换AST](/images//babel-plugin-ast.png)
+在使用Babel对Javascript源文件进行处理时，有三个主要步骤，分别是： 解析（parse），转换（transform），生成（generate）。Babel首先会将源文件转换为抽象语法树(AST)，然后对抽象语法树进行转换，最后由抽象语法树生成新的源代码，如下图所示。在转换（transform）阶段，Babel提供了非常便利的插件机制，开发者可以在插件中实现自己的AST转换。关于如何开发Babel插件，最好的教程就是[官方文档](https://github.com/thejameskyle/babel-handbook/blob/master/translations/en/plugin-handbook.md)。
 
-在使用Babel对Javascript源文件进行处理时，有三个主要步骤，分别是： 解析（parse），转换（transform），生成（generate）。Babel首先会将源文件转换为抽象语法树(AST)，然后对抽象语法树进行转换，最后由抽象语法树生成新的源代码。在转换（transform）阶段，Babel提供了非常便利的插件机制，开发者可以在插件中实现自己的AST转换。关于如何开发Babel插件，最好的教程就是[官方文档](https://github.com/thejameskyle/babel-handbook/blob/master/translations/en/plugin-handbook.md)。
+![babel插件转换AST](/images//babel-plugin-ast.png)
 
 在对AST的转换阶段，Babel使用babel-traverse对AST进行深度优先遍历，它的插件机制使得我们可以针对某个特定类型的语法树节点（比如，函数、条件语句等）注册钩子函数，从而完成我们对语法树的转换工作。
 
