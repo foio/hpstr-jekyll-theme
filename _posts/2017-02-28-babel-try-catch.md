@@ -224,8 +224,7 @@ loaders: [
             ......
             {
                 test: /\.jsx|\.js$/,
-                loader: DEBUG ? 'babel-loader'
-                    : 'babel-try-catch-loader?rethrow=true&verbose&reporter=reportError&tempdir=.tryCatchResult',
+                loader: 'babel-loader!babel-try-catch-loader?rethrow=true&verbose&reporter=reportError&tempdir=.tryCatchResult',
                 exclude: /node_modules/
             }
             ......
