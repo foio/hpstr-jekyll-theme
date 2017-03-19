@@ -224,11 +224,13 @@ loaders: [
             ......
             {
                 test: /\.jsx|\.js$/,
-                loader: 'babel-loader!babel-try-catch-loader?rethrow=true&verbose&reporter=reportError&tempdir=.tryCatchResult',
+                loader: 'babel-try-catch-loader?rethrow=true&verbose&reporter=reportError&tempdir=.tryCatchResult!babel-loader',
                 exclude: /node_modules/
             }
             ......
         ],
+
+devtool: 'source-map'
 ```
 
-上文中的配置文件，对项目中的所有源代码使用babel-try-catch-loader处理后，再使用babel-loader处理，保证了经过后续的混淆、压缩并发布到线上环境的生产代码仍然具有较强的debug能力。详细的配置文件请参考[webpack-try-catch-demo](https://github.com/foio/webpack-try-catch-demo)。
+上文中的配置文件，对项目中的所有源代码使用babel-loader进行转换，然后使用babel-try-catch-loader处理babel-loader产生的代码和source map，保证了经过后续的混淆、压缩并发布到线上环境的生产代码仍然具有较强的debug能力。详细的配置文件请参考[webpack-try-catch-demo](https://github.com/foio/webpack-try-catch-demo)。实现原理请参考[babel-try-catch-loader](https://github.com/foio/babel_try_catch_loader).
