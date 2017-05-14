@@ -376,8 +376,18 @@ class TodoItemModel {
 
 ```
 
+
 需要注意的是action只能影响同步函数，函数中如果有异步调用，则需要对异步调用的函数也使用aciton包裹。请[参考官方文档](http://mobxjs.github.io/mobx/refguide/action.html)。
 
+
+
+###(4). 服务端渲染时设置useStaticRendering为true
+
+上文中，我们知道可以通过使用@observer，将react组件转换成一个监听者(Reactions)，这样在被监听的应用状态变量(Observable)有更新时，react组件就会重新渲染。而对于服务端的React组件，我们只需要它被渲染一次，而不需要组件监听模型的状态。事实上，如果服务端React组件像客户端组件一样监听模型的状态变化，就会造成严重的内存泄漏问题。官方提供了`useStaticRendering`方法，用于避免mobx服务端渲染的内存泄漏问题; 该方法只需要在server启动时设置一次。
+
+``` javascript
+useStaticRendering(true);
+```
 
 ##4.mobx与redux的对比
 
